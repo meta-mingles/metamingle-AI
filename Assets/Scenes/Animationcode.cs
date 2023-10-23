@@ -20,10 +20,18 @@ public class Animationcode : MonoBehaviour
 
         Process psi = new Process();
 
+
+/*        // 나래 경로
+        psi.StartInfo.FileName = "C:/Users/user/anaconda3/envs/mtvs_final/python.exe";
+        psi.StartInfo.Arguments = "D:/mtvs_10_meta_mingle/pose_estimation/socket_pose_cvzone.py";*/
+
+
+
+        //예찬 경로
         psi.StartInfo.FileName = "C:/Users/user/miniconda3/envs/mmpose/python.exe";
-        // 파이썬 환경 연결
         psi.StartInfo.Arguments = "D:/Meta_Final_Project/metamingle-AI3/Assets/Scenes/socket_pose_cvzone.py";
-        // 실행할 파이썬 파일
+
+      
 
 
 
