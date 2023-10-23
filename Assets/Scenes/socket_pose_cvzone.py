@@ -23,13 +23,15 @@ detector = PoseDetector()
 # pose_ind = [0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28]         # 몸통
 
 pose_name = ['N','Leyei','Leye','Leyeo','Reyei','Reye','Reyeo','Lear','Rear','LM','RM',
-             'LS','RS','LE','RE','LW','RW',
-             'LP','RP','LK','RK','LA','RA']
+             'LS','RS','LE','RE','LW','RW','Lpinky','Rpinky','Lindex','Rindex','Lthumb','Rthumb',
+             'LP','RP','LK','RK','LA','RA','LH','RH','LFindex','RFindex']
 # 코(Nose), 왼쪽 눈 안쪽(Leyei), 왼쪽 눈(Leye), 왼쪽 눈 바깥쪽(Leyeo),
 # 오른쪽 눈 안쪽(Reyei), 오른쪽 눈(Reye), 오른쪽 눈 바깥쪽(Reyeo),
 # 왼쪽 귀(Lear), 오른쪽 귀(Rear), 왼쪽 입(LM), 오른쪽 입(RM),
 # 왼쪽 어깨(LS), 오른쪽 어깨(RS), 왼쪽 팔꿈치(LE), 오른쪽 팔꿈치(RE), 왼쪽 손목(LW), 오른쪽 손목(RW),
+# 왼쪽새끼(Lpinky),오른쪽새끼(Rpinky),왼쪽검지(Lindex),오른쪽엄지(Rindex),왼쪽검지(Lthumb),오른쪽검지(Rthumb),
 # 왼쪽 골반(LP), 오른쪽 골반(RP), 왼쪽 무릎(LK), 오른쪽 무릎(RK), 왼똑 발목(LA), 오른쪽 발목(RA)
+# 왼쪽 뒤꿈치(LH), 오른쪽 뒤꿈치(RH), 왼쪽엄지발(LFindex), 왼쪽엄지발(RFindex)
 
 ## 영상촬영
 
