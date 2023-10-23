@@ -6,26 +6,31 @@ using System.Net.Sockets;
 using UnityEngine;
 using System.Diagnostics;
 
+
 public class Animationcode : MonoBehaviour
 {
     public GameObject[] Body;
 
     private Socket clientSocket;
 
+    string pythonExePath;
+
     private void Start()
     {
+
         Process psi = new Process();
-        psi.StartInfo.FileName = System.Environment.GetEnvironmentVariable("PYTHONEXE_PATH");
 
-        // ���̽� ȯ�� ����
-        psi.StartInfo.FileName = System.Environment.GetEnvironmentVariable("MEDIAPIPE_PYTHON_PATH");
-        
+        psi.StartInfo.FileName = "C:/Users/user/miniconda3/envs/mmpose/python.exe";
+        // 파이썬 환경 연결
+        psi.StartInfo.Arguments = "D:/Meta_Final_Project/metamingle-AI3/Assets/Scenes/socket_pose_cvzone.py";
+        // 실행할 파이썬 파일
 
-        // ������ ���̽� ����
+
+
         psi.StartInfo.CreateNoWindow = true;
         psi.StartInfo.UseShellExecute = false;
         psi.Start();
-        UnityEngine.Debug.Log("����Ϸ�");
+        UnityEngine.Debug.Log("실행완료");
 
         clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         IPAddress serverIP = IPAddress.Parse("127.0.0.1");
@@ -46,27 +51,28 @@ public class Animationcode : MonoBehaviour
 
     void Update()
     {
-        int counter = 0;
         
+        int counter = 0;
+
         try
         {
-            //����Ƽ�� �������� 
+            //유니티에 값보내기 
             string message = "Hello from Unity!";
             byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes(message);
             clientSocket.Send(messageBytes);
 
 
-            //���̽㿡�� �� �ޱ�
+            //파이썬에서 값 받기
             byte[] buffer = new byte[1024];
             int receivedBytes = clientSocket.Receive(buffer);
-            string receivedMessage = System.Text.Encoding.UTF8.GetString(buffer, 0, receivedBytes); //receivedMessage ���ڿ��ޱ�
+            string receivedMessage = System.Text.Encoding.UTF8.GetString(buffer, 0, receivedBytes); //receivedMessage 문자열받기
             UnityEngine.Debug.Log($"Received from Python: {receivedMessage}");
 
-            // ���ڿ����� ��ȣ �� ��ǥ�� ����
+            // 문자열에서 괄호 및 쉼표를 제거
             receivedMessage = receivedMessage.Replace("[[", "").Replace("]]", "").Replace(", [", "");
             string[] coordinatePairs = receivedMessage.Split(new char[] { ']' }, StringSplitOptions.RemoveEmptyEntries);
 
-            // �� ��ǥ ���� �ݺ��ϰ� x, y, z ���� ����
+            // 각 좌표 쌍을 반복하고 x, y, z 값을 추출
             foreach (string pair in coordinatePairs)
             {
                 //UnityEngine.Debug.Log($"pair: {pair}");
@@ -84,7 +90,7 @@ public class Animationcode : MonoBehaviour
         }
         catch (Exception e)
         {
-            UnityEngine.Debug.LogError("[�˸�] �����߻�: " + e.Message);
+            UnityEngine.Debug.LogError("[알림] 에러발생: " + e.Message);
             clientSocket.Shutdown(SocketShutdown.Both);
             clientSocket.Close();
         }
