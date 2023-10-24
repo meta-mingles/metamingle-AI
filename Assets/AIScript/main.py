@@ -6,11 +6,12 @@ from typing import Union
 
 from fastapi import FastAPI
 #dsds
-from domain import Make_script
+from domain import Make_script,For_connect_Unity
 
 app = FastAPI()
 
 app.include_router(Make_script.router)
+app.include_router(For_connect_Unity.router)
 
 @app.get("/")
 def read_root():
