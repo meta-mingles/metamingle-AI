@@ -79,6 +79,7 @@ class Other_chat(BaseModel):
 @router.post("/other_chat")
 def chat(item: Other_chat):
 
+    print("시작")
     user_input = item.dict()['other_user_input']
 
     system_text='''
@@ -86,10 +87,10 @@ def chat(item: Other_chat):
         사용자가 겪은 경험을 간결하고 임팩트 있게 전달할 수 있도록 유투브 쇼츠 대본을 만들어줘.  흥미를 돋구는 말투로 재밌게 써 줘.
 
         1. 사용자가 움직이는 몸의 행동의 경우 괄호()안에 써서 제시해줘
-        2. 영상 제목, 오프닝, 내용, 결론 순으로 작성해줘, 출력은 모두 감싸서 content로 줘야돼
+        2. 영상 제목, 오프닝, 내용, 결론 순으로 작성해줘, 이 내용은 content에 하나의 문자열로 들어갈 꺼야
         3. 자신감 있고 캐주얼한 말투로 주제에 대한 정보를 반말로 작성해줘
-        4. 마지막으로 이 영상을 어디서 찍으면 좋을지 장소를 한 단어로 알려줘
-        5. 출력할때 내용은 content 장소는 place에 매칭해서 json 형태로 만들어줘
+        4. 이 영상을 어디서 찍으면 좋을지 장소를 한 단어로 출력할때 place에 할당해줘
+        5. json형태로 content, place 순서로 출력해줘
     '''
 
     pre_input = '''
@@ -98,13 +99,8 @@ def chat(item: Other_chat):
 
     pre_output ='''
         {
-        "content": {
-            "영상 제목": "【미스터리 한국어】'발이 넓다' 뜻 알고 있었니?",
-            "오프닝": "(카메라를 향해 미소 날리며) 이봐, 여기 좋은 이야기 들어봤니? 오늘 한 말에서 배운 새로운 표현 하나 소개해줄게.",
-            "내용": "(두 손을 펼치며) '발이 넓다니?' 엥? 나한테? 아니, 나는 웬만한 사람보다 발이 작거든. 그게 무슨 말이야? (책을 넘기는 척) 그런데 여기서 꿀팁! '발이 넓다'란 말은 사실은 발 사이즈랑 전혀 상관 없어! 친구가 많다는 걸 의미하는 거래. 고마운 내 친구가 가르쳐줬어. 신기하지 않아?",
-            "결론": "(큰 소리로) 그래서 요즘 내 스타일은 발이 아주~ 넓어지는 중! 그래서 너도 오늘부터 발을 넓혀봐. 어플로 친구 추가, SNS에 좋아요 누르고 새 친구들 만나기. 널 넓은 세상으로 초대할게. (카메라를 향해 손짓) 이번 영상이 좋았다면, 구독하고 좋아요 버튼 꾹 눌러줘! 다음 영상에서 만나자, 바이바이~"
-        },
-        "place": "서점"
+        "content": "[영상 제목] 발이 넓다고? 그게 뭐야? 아는 척 해보자! [오프닝] : (손을 휙~ 들어올리며) 여러분~ 안뇽! 여기 아는 척 하는 게 재밌는 난장이가 왔어. 오늘도 신기방기 아는 척 해보자![내용] : 그래서 오늘! 아는척에 도전할 말은 '발이 넓다'야. 어제 누가 나한테 '넌 발이 넓어~'라고 했지 뭐야? 나는 절대 발이 크지 않다구! 정말 이해를 못했어, 근데 얘들아 별걸 다 가르쳐주네. 듣고나니 '넌 친구가 많구나'란 뜻이래!  바로 그래, 이런 웃기고 신기한 정보! [결론] : 그래서 이렇게 오늘의 아는 척 완성! '발이 넓다'라는 말, 이제 니들도 알지? 누군가에게 이걸로 장난 쳐봐. 내일은 또 어떤 신기방기 소식으로 찾아갈지 기대해봐. 그럼 안뇽~",
+        "place": "홈 스튜디오"
         }
     '''
 
@@ -118,7 +114,7 @@ def chat(item: Other_chat):
         ]
 
     chat_completion = openai.ChatCompletion.create( ## gpt 오브젝트 생성후 메세지 전달
-    model="gpt-3.5-turbo", 
+    model="gpt-4", 
     messages=messages,
     temperature=1,
     max_tokens=1000,
@@ -127,11 +123,13 @@ def chat(item: Other_chat):
 
     result = chat_completion.choices[0].message.content
 
-
+    print(result)
 
     json_data = json.loads(result)
     chaged_result =json.dumps(json_data, indent=4, ensure_ascii=False)
     
-    print(chaged_result)
+  
 
     return chaged_result 
+
+
