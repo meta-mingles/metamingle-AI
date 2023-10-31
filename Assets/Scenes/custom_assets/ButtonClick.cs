@@ -13,11 +13,12 @@ using System.IO;
 public class ButtonClick : MonoBehaviour
 {
 
-
-    private string apiUrl_chat = "http://192.168.0.77:8001/chatbot/test_text";
-    private string apiUrl = "http://192.168.0.77:8001/chatbot/test_image"; // FastAPI 서버의 엔드포인트 URL을 입력하세요.
-/*    private string apiUrl_chat = "http://127.0.0.1:8000/chatbot/test_text";
-    private string apiUrl = "http://127.0.0.1:8000/chatbot/test_image"; // FastAPI 서버의 엔드포인트 URL을 입력하세요.*/
+    private string apiUrl_chat = "https://bec3-221-163-19-218.ngrok-free.app/chatbot/test_text";
+    private string apiUrl = "https://bec3-221-163-19-218.ngrok-free.app/chatbot/test_image"; // FastAPI 서버의 엔드포인트 URL을 입력하세요.
+    // private string apiUrl_chat = "http://192.168.0.77:8001/chatbot/test_text";
+    // private string apiUrl = "http://192.168.0.77:8001/chatbot/test_image"; // FastAPI 서버의 엔드포인트 URL을 입력하세요.
+    /*    private string apiUrl_chat = "http://127.0.0.1:8000/chatbot/test_text";
+        private string apiUrl = "http://127.0.0.1:8000/chatbot/test_image"; // FastAPI 서버의 엔드포인트 URL을 입력하세요.*/
 
 
 
@@ -49,10 +50,11 @@ public class ButtonClick : MonoBehaviour
 
         // JSON 데이터를 바이트 배열로 변환
         byte[] jsonData = Encoding.UTF8.GetBytes(json);
-        Debug.Log("데이터보내기");
-        StartCoroutine(PostJson(jsonData));
-        Debug.Log("사진도 보낸당");
+        Debug.Log("배경생성 요청");
         StartCoroutine(PostImageFile(jsonData));
+        Debug.Log("시나리오 생성 요청");
+        StartCoroutine(PostJson(jsonData));
+
     }
 
 
