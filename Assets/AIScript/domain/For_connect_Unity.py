@@ -4,7 +4,7 @@ from starlette.responses import FileResponse
 from pathlib import Path
 from typing import Union
 from pydantic import BaseModel
-from sd_test.sd_test_NR import loc_cls, make_image
+from domain.sd_test_NR import loc_cls,make_image
 
 import json
 import re
@@ -26,6 +26,7 @@ router = APIRouter(
 )
 
 
+
 class Text(BaseModel):
     text: Union[str, None] = None
 
@@ -35,12 +36,12 @@ def test(item: Text):
     print(text)
 
     system='''
-    해당 텍스트는 사용자의 경험담이야. 이 이야기로 약 60초 이내의 임팩트 있는 정보전달 목적의 영상을 만들거야.
-    1.400자 이내로 쉽게 대학생 말투와 반말로 대본을 만들어줘.
-    2.사용자는 상체만 나오고 소품을 활용하지 않아.
+    해당 텍스트는 사용자의 경험담이야. 이 이야기로 다수에게 전하는 약 60초 이내의 임팩트 있는 정보전달 목적의 영상을 만들거야.
+    1.400자 이내로 쉽게 학생 말투와 반말로 대본을 만들어줘.
+    2.사용자는 상체만 나오고 소품을 활용하지 않아. 댓글도 쓰지 않아.
     3.행동은 3개 이내로 괄호()안에 지시어로 작성해줘.
-    4.영상 제목, 오프닝, 내용, 결론 순으로 작성해줘.
-    5.영어로 말한 경우는 영어로 답변해줘.
+    4.영상 제목, 오프닝, 내용, 결론으로 나눠서 작성해줘
+    5.영어로 말한 경우는 영어로, 한글로 말한 경우는 한글로 작성해줘.
     '''
     messages=[
         {"role": "system", "content": system},
@@ -63,22 +64,13 @@ def test(item: Text):
 @router.post("/test_image")
 def test_image(item: Text):
     text = item.dict()['text']
+    # print(text)
+
+    if os.path.isfile('images/test.jpg'):
+        os.remove('images/test.jpg')
 
     location = loc_cls(text)            # 장소를 분류함
     print(location)
-    image = make_image(location)        # image를 images/test.jpg로 저장함.
+    image_path = make_image(location)
 
-    return FileResponse("images/test.jpg")
-
-
-@router.post("/send_image/")
-async def send_image(request_str: str):
-    if request_str == "말":
-        image_path = Path("../images/말.jpg")  # 이미지 파일 경로
-        if image_path.is_file():
-            return FileResponse(image_path)
-        else:
-            raise HTTPException(status_code=500, detail="이미지를 찾을 수 없습니다.")
-    else:
-        raise HTTPException(status_code=400, detail="해당하는 이미지를 찾을 수 없습니다.")
-
+    return FileResponse(image_path)

@@ -7,6 +7,8 @@
     <list default="true" id="20385f89-5c27-433c-af33-f5e500d8a906" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/domain/For_connect_Unity.py" beforeDir="false" afterPath="$PROJECT_DIR$/domain/For_connect_Unity.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sd_test/sd_test_NR.py" beforeDir="false" afterPath="$PROJECT_DIR$/sd_test/sd_test_NR.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Resources/Images/test.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/../Resources/Images/test.jpg" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
