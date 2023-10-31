@@ -36,7 +36,7 @@ def test(item: Text):
 
     system='''
     해당 텍스트는 사용자의 경험담이야. 이 이야기로 약 60초 이내의 임팩트 있는 정보전달 목적의 영상을 만들거야.
-    1.500자 이내로 쉽게 대학생 말투와 반말로 대본을 만들어줘.
+    1.400자 이내로 쉽게 대학생 말투와 반말로 대본을 만들어줘.
     2.사용자는 상체만 나오고 소품을 활용하지 않아.
     3.행동은 3개 이내로 괄호()안에 지시어로 작성해줘.
     4.영상 제목, 오프닝, 내용, 결론 순으로 작성해줘.
@@ -63,10 +63,10 @@ def test(item: Text):
 @router.post("/test_image")
 def test_image(item: Text):
     text = item.dict()['text']
-    print(text)
 
-    # location = loc_cls(text)            # 장소를 분류함
-    # image = make_image(location)        # image를 images/test.jpg로 저장함.
+    location = loc_cls(text)            # 장소를 분류함
+    print(location)
+    image = make_image(location)        # image를 images/test.jpg로 저장함.
 
     return FileResponse("images/test.jpg")
 
