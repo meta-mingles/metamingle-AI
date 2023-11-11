@@ -6,13 +6,9 @@ from typing import Union
 
 from fastapi import FastAPI
 #dsds
-from domain import Make_script,For_connect_Unity
+from domain import Alpha_Script
 
 app = FastAPI()
 
-app.include_router(Make_script.router)
-app.include_router(For_connect_Unity.router)
+app.include_router(Alpha_Script.router)
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
