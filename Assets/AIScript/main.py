@@ -11,4 +11,3 @@ from domain import Alpha_Script
 app = FastAPI()
 
 app.include_router(Alpha_Script.router)
-

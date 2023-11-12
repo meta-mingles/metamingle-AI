@@ -56,6 +56,7 @@ async def send_message(text: str) -> AsyncIterable[str]:
     system_messages= '''
     해당 텍스트는 사용자의 경험담이야. 이 이야기로 약 60초 이내의 임팩트 있는 영상을 만들거야.
     1.500자 이내로 쉽게 대학생 말투와 반말로 대본을 만들어줘.
+    1-1. 자기자신을 대학생이라고 소개하지 마
     2.사용자는 상체만 나오고 소품을 활용하지 않아.
     3.행동은 3개 이내로 괄호()안에 지시어로 작성해줘.
     3.한 문장이 끝날때 마다 "|"이 기호로 표현해줘
@@ -133,11 +134,44 @@ async def send_message(text: str) -> AsyncIterable[str]:
     시나리오를 생성하기 위해 더 다양한 이야기를 해주세요
     '''
 
+    few_shot_input3='''
+    빼빼로 데이가 사실 마케팅 전략이였대, 나는 우리나라의 긴 역사가 있는 날인 줄 알았는데 속은 느낌이야! 내 친구는 가래떡 데이라고 하던데 너희는 빼뺴로랑 가래떡중에 어떤걸 받고싶니?
+    '''
+    few_shot_output3='''
+    제목: "빼빼로 데이 vs 가래떡 데이, 너는 어떤 걸 받고 싶어?"|
+
+    오프닝:|
+    (카메라를 바라보며 미소)|
+    "안녕? 난 대학생이지." |
+    (손가락으로 빼빼로 모양을 그리며)|
+    "오늘은 빼빼로 데이에 대해서 이야기해봐야겠어." |
+
+    내용:|
+    (잠시 생각하는 척하며)|
+    "너도 알겠지만, 사실 빼빼로 데이는 마케팅 전략이었어." |
+    "우리나라의 긴 역사가 있는 날인줄 알았는데, 알고 보니 마케팅 전략이라니, 속은 느낌이지?" |
+    (웃으며)|
+    "그런데 내 친구가 가래떡 데이라는 걸 말하더라고." |
+
+    (잠시 생각하는 척하며)|
+    "그래서 생각해봤어. 빼빼로 데이와 가래떡 데이, 사실 둘 다 마음을 전하는 날이잖아?" |
+    "그럼 너는 빼빼로와 가래떡, 어떤 걸 받고 싶을까?" |
+
+    결론 :|
+    (카메라를 바라보며 미소)|
+    "나는 아직 고민 중이야. 빼빼로도 좋고 가래떡도 좋아." |
+    "그런데 가래떡 데이라는 건 처음 들어봐서, 이번엔 가래떡 데이를 즐겨볼까 생각중이야." |
+    (카메라로 손을 흔듬)|
+    "그럼 너는 어떤 걸 받고 싶어? 댓글로 알려줘. 그럼 다음에 또 만나. 바이바이~!"
+    '''
+
+
     # Begin a task that runs in the background.
     task = asyncio.create_task(wrap_done(
         model.agenerate(messages=[[SystemMessage(content=system_messages),HumanMessage(content=few_shot_input1),
                                    AIMessage(content=few_shot_output1),HumanMessage(content=few_shot_input2),
-                                   AIMessage(content=few_shot_output2),  HumanMessage(content=text)]]),
+                                   AIMessage(content=few_shot_output2),HumanMessage(content=few_shot_input3),
+                                   AIMessage(content=few_shot_output3),  HumanMessage(content=text)]]),
         callback.done),
     )
 
