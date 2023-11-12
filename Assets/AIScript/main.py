@@ -1,6 +1,6 @@
 # fastAPI 실행 코드
 # python -m uvicorn main:app --reload
-# python -m uvicorn main:app --reload --host=0.0.0.0 --port=8000
+# python -m uvicorn main:app --reload --host=0.0.0.0 --port=8011
 
 from typing import Union
 
