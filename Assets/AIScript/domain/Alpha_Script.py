@@ -39,6 +39,77 @@ router = APIRouter(
     prefix="/chatbot",
 )
 
+
+######################################################
+### 퀴즈 생성
+class quiz_gen(BaseModel):
+    text: str
+
+
+@router.post("/quiz_gen")
+def image_def(input: quiz_gen):
+    print(input.text)
+
+    system = '''
+        사용자는 A이고 퀴즈를 보는 사람들은 B이야.
+        사용자의 이야기를 듣고 한 가지 재치있는 퀴즈를 만들어줘
+        1. 퀴즈는 사용자에 집중하지 않고 장소, 상황에 집중해서 문제를 내줘
+        2. 퀴즈를 맞추는 사람은 사용자의 이야기를 모르고 있어
+        3. 퀴즈를 맞추는 사람이 모를만한 사용자의 개인적인 경험은 퀴즈로 내지마
+        4. 퀴즈는 질문만 알려줘
+        5.한국어로 퀴즈를 알려주고 줄 바꿈 후  영어로 알려줘
+        6. 퀴즈를 맞추는 사람이 유추 할 수 있으면 문제를 제공해
+        7.퀴즈를 맞추는 사람이  유추 할 수 없으면 "Noquiz" 고 말해
+        '''
+    
+    input1='''
+    I ate yesterday
+    '''
+    output1='''
+    Noquiz
+    '''
+    input2='''
+    나는 어제 놀이동산에서 놀았는데 츄러스가 맛있더라 놀이동산에서는 츄러스를 꼭 먹어야지
+    '''
+    output2='''
+    한국어 : 놀이동산에서 가장 대표적인 간식은 무엇일까요?
+
+    English : What is the most representative snack in the amusement park?
+    '''
+    input3='''
+    내가 어제 새로운 말을 배웠어. 어제 누가 나보고 발이 넓다고 하는거야 나는 발이 남들보다 작은데 말이야 그 말을 처음에 이해하지 못했어 그런데 친구가 많다는 말이래 신기하지 않아?
+    '''
+    output3='''
+    한국어 : '발이 넓다'라는 표현은 무슨 뜻일까요?
+
+    English : What does the expression 'having a wide foot' mean?
+    '''
+
+    messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": input1},
+        {"role": "assistant", "content": output1},
+        {"role": "user", "content": input2},
+        {"role": "assistant", "content": output2},
+        {"role": "user", "content": input3},
+        {"role": "assistant", "content": output3},
+        {"role": "user", "content": input.text}
+    ]
+
+    chat_completion = openai.ChatCompletion.create(  ## gpt 오브젝트 생성후 메세지 전달
+        model="gpt-4",
+        messages=messages,
+        temperature=1,
+        max_tokens=1000
+    )
+    
+    result = chat_completion.choices[0].message.content
+    print("퀴즈 생성 결과 : "+result)
+    return {"Quiz" : result}
+######################################################
+
+
+
 final_token=""
 ######################################################
 #### 비동기 스트리밍 통신
@@ -60,7 +131,7 @@ async def send_message(text: str) -> AsyncIterable[str]:
     2.사용자는 상체만 나오고 소품을 활용하지 않아.
     3.행동은 3개 이내로 괄호()안에 지시어로 작성해줘.
     3.한 문장이 끝날때 마다 "|"이 기호로 표현해줘
-    4. 좋아요와 구독 관련된 이야기는 말하지마
+    4. 좋아요와 구독,댓글 관련된 이야기는 말하지마
     5. 사용자의 입력이 영어인지 한국어인지 판단후 다음의 순서를 따라가줘
     6. 사용자의 입력이 한국어일때
     6-1.한국어로 말한 경우 영상 제목, 오프닝, 내용, 결론 순으로 한국어로 답변해줘
@@ -141,8 +212,6 @@ async def send_message(text: str) -> AsyncIterable[str]:
     제목: "빼빼로 데이 vs 가래떡 데이, 너는 어떤 걸 받고 싶어?"|
 
     오프닝:|
-    (카메라를 바라보며 미소)|
-    "안녕? 난 대학생이지." |
     (손가락으로 빼빼로 모양을 그리며)|
     "오늘은 빼빼로 데이에 대해서 이야기해봐야겠어." |
 
@@ -162,7 +231,7 @@ async def send_message(text: str) -> AsyncIterable[str]:
     "나는 아직 고민 중이야. 빼빼로도 좋고 가래떡도 좋아." |
     "그런데 가래떡 데이라는 건 처음 들어봐서, 이번엔 가래떡 데이를 즐겨볼까 생각중이야." |
     (카메라로 손을 흔듬)|
-    "그럼 너는 어떤 걸 받고 싶어? 댓글로 알려줘. 그럼 다음에 또 만나. 바이바이~!"
+    "그럼 너는 어떤 걸 받고 싶어? 그럼 다음에 또 만나. 바이바이~!"
     '''
 
 
