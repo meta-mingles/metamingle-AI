@@ -3,6 +3,7 @@ import openai
 import dotenv
 import os
 import time
+import json
 
 from fastapi import APIRouter
 
@@ -60,29 +61,32 @@ def image_def(input: quiz_gen):
         5.한국어로 퀴즈를 알려주고 줄 바꿈 후  영어로 알려줘
         6. 퀴즈를 맞추는 사람이 유추 할 수 있으면 문제를 제공해
         7.퀴즈를 맞추는 사람이  유추 할 수 없으면 "Noquiz" 고 말해
+        8.출력은 key값이 korea,english,isquiz를 가지고 반환해줘
         '''
     
-    input1='''
-    I ate yesterday
-    '''
-    output1='''
-    Noquiz
-    '''
-    input2='''
-    나는 어제 놀이동산에서 놀았는데 츄러스가 맛있더라 놀이동산에서는 츄러스를 꼭 먹어야지
-    '''
+    input1='''I ate yesterday'''
+    output1='''{
+    "korea" : "",
+    "english" : "",
+    "isquiz":"no"
+    }'''
+    input2='''나는 어제 놀이동산에서 놀았는데 츄러스가 맛있더라 놀이동산에서는 츄러스를 꼭 먹어야지'''
     output2='''
-    한국어 : 놀이동산에서 가장 대표적인 간식은 무엇일까요?
-
-    English : What is the most representative snack in the amusement park?
+    {
+    "korea" : "놀이동산에서 가장 대표적인 간식은 무엇일까요?",
+    "english" : "What is the most representative snack in the amusement park?",
+    "isquiz":"yes"
+    }
     '''
     input3='''
     내가 어제 새로운 말을 배웠어. 어제 누가 나보고 발이 넓다고 하는거야 나는 발이 남들보다 작은데 말이야 그 말을 처음에 이해하지 못했어 그런데 친구가 많다는 말이래 신기하지 않아?
     '''
     output3='''
-    한국어 : '발이 넓다'라는 표현은 무슨 뜻일까요?
-
-    English : What does the expression 'having a wide foot' mean?
+    {
+    "korea" : "'발이 넓다'라는 표현은 무슨 뜻일까요?",
+    "english" : "What does the expression 'having a wide foot' mean?",
+    "isquiz":"yes"
+    }
     '''
 
     messages = [
@@ -104,8 +108,9 @@ def image_def(input: quiz_gen):
     )
     
     result = chat_completion.choices[0].message.content
-    print("퀴즈 생성 결과 : "+result)
-    return {"Quiz" : result}
+    print(result)
+    output = json.loads(result)
+    return output
 ######################################################
 
 
