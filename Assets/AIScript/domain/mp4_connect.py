@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile,Depends,Form
 from fastapi.responses import StreamingResponse
 import io
 import shutil
@@ -15,22 +15,31 @@ router = APIRouter(
     prefix="/mp4",
 )
 
+class def_filename(BaseModel):
+    file_uuid: str
 
 @router.post("/en_script_video/")
-async def process_video(file: UploadFile = File(...)):
+# async def process_video(file: UploadFile = File(...), file_class: def_filename = Depends()): ##file_class json으로 받기
+#     file_n=file_class.file_uuid
+####### 테스트용
+async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)):
+    file_n=file_uuid
+#######
+
+
 
     save_folder = "pre_mp4"
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
 
-    file_location = f"{save_folder}/{file.filename}"
+    file_location = f"{save_folder}/{file_n}.mp4"
 
     # 파일 시스템에 파일 쓰기
     with open(file_location, "wb") as data:
         shutil.copyfileobj(file.file, data)
     
     language="en"
-    real_filename=make_mp4s(file_location,file.filename,language)
+    real_filename=make_mp4s(file_location,file_n,language)
 
     sand_folder="post_mp4"
     send_file_location = f"{sand_folder}/{real_filename}"
@@ -40,15 +49,13 @@ async def process_video(file: UploadFile = File(...)):
 
 
 
-class def_filename(BaseModel):
-    filename: str
-
 @router.post("/kr_script_video/")
-async def process_video(fileclass: def_filename):
-    file_n=fileclass.filename
+async def process_video(file_class: def_filename):
+
+    file_n=f"{file_class.file_uuid}.mp4"
     
     save_folder = "pre_mp4"
-
+    
     file_location = f"{save_folder}/{file_n}"
     
     language="kr"

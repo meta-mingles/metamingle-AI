@@ -8,7 +8,7 @@ import deepl
 import os  
 from dotenv import load_dotenv
 
-def make_mp4s(file_location,filename,langauge):
+def make_mp4s(file_location,mp4_id,langauge):
 
     scripts_folder = "Script"
 
@@ -24,7 +24,6 @@ def make_mp4s(file_location,filename,langauge):
     translator = deepl.Translator(auth_key)
     client = OpenAI()
 
-    mp4_id=filename.split('.')[0]
     target_mp4=file_location
 
     #################### open ai 에서 whisper사용, 영상에서 대본 추출 저장
@@ -159,13 +158,14 @@ def make_script_mp4(script_id,target_mp4):
 
     # 영상에 추가할 자막 폰트 설정
     font_path = "kbo.ttf"
-
+    text_position = ('center', video.size[1] - 90)
     # 각 자막에 대한 TextClip 생성 및 위치 설정
     clips = [video]
     for subtitle in subtitles:
 
         text_clip = TextClip(subtitle.content, fontsize=36, color='white', font=font_path)
-        text_clip = text_clip.set_start(subtitle.start.total_seconds()).set_end(subtitle.end.total_seconds()).set_position('bottom')
+        # text_clip = text_clip.set_start(subtitle.start.total_seconds()).set_end(subtitle.end.total_seconds()).set_position('bottom')
+        text_clip = text_clip.set_start(subtitle.start.total_seconds()).set_end(subtitle.end.total_seconds()).set_position(text_position)
         clips.append(text_clip)
 
     # 동영상과 자막을 합성
