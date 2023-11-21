@@ -52,11 +52,11 @@ async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)
 @router.post("/kr_script_video/")
 async def process_video(file_class: def_filename):
 
-    file_n=f"{file_class.file_uuid}.mp4"
+    file_n=f"{file_class.file_uuid}"
     
     save_folder = "pre_mp4"
     
-    file_location = f"{save_folder}/{file_n}"
+    file_location = f"{save_folder}/{file_n}.mp4"
     
     language="kr"
     real_filename=make_mp4s(file_location,file_n,language)

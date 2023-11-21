@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 def make_mp4s(file_location,mp4_id,langauge):
 
     scripts_folder = "Script"
-
+    print(mp4_id)
 
     if not os.path.exists(scripts_folder):
         os.makedirs(scripts_folder)
@@ -30,7 +30,7 @@ def make_mp4s(file_location,mp4_id,langauge):
 
     if langauge=="en":
         script_id_en=f"{mp4_id}_en"
-        script_id_kr=f"{mp4_id}+_kr"
+        script_id_kr=f"{mp4_id}_kr"
 
         video_clip = VideoFileClip(target_mp4)
         audio_clip = video_clip.audio
@@ -158,12 +158,12 @@ def make_script_mp4(script_id,target_mp4):
 
     # 영상에 추가할 자막 폰트 설정
     font_path = "kbo.ttf"
-    text_position = ('center', video.size[1] - 90)
-    # 각 자막에 대한 TextClip 생성 및 위치 설정
+    text_position = ('center', video.size[1]*(0.80))
+    # 각 자막에 대한 TextClip 생성 및 위치 설정7
     clips = [video]
     for subtitle in subtitles:
 
-        text_clip = TextClip(subtitle.content, fontsize=36, color='white', font=font_path)
+        text_clip = TextClip(subtitle.content, fontsize=36, color='white', font=font_path,bg_color="black")
         # text_clip = text_clip.set_start(subtitle.start.total_seconds()).set_end(subtitle.end.total_seconds()).set_position('bottom')
         text_clip = text_clip.set_start(subtitle.start.total_seconds()).set_end(subtitle.end.total_seconds()).set_position(text_position)
         clips.append(text_clip)

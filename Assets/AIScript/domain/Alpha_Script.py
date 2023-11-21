@@ -294,8 +294,7 @@ def image_def(input: Image_connect):
         2. 보기에 해당되지 않는 경우, 실외라면 "park", 실내라면 "home"으로 분류해줘.
         3. 장소에 해당되지 않는 입력이면 "home"으로 분류해줘
         4. 입력이 없으면 "home"만 나타내줘
-        5. 출력으로는 장소만 나타내줘 
-        
+        5. 출력으로는 장소만 나타내줘
         '''
     messages = [
         {"role": "system", "content": system},
