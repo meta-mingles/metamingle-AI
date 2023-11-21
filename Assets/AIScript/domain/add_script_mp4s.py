@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 def make_mp4s(file_location,mp4_id,langauge):
 
     scripts_folder = "Script"
-    print(mp4_id)
 
     if not os.path.exists(scripts_folder):
         os.makedirs(scripts_folder)

@@ -28,6 +28,11 @@ from langchain.prompts import (
     ChatPromptTemplate,
 )
 
+from databases import Database
+
+DATABASE_URL = "mysql+pymysql://root:1234@127.0.0.1:3306/place_classification"
+database = Database(DATABASE_URL)
+
 
 
 dotenv_file = dotenv.find_dotenv()
@@ -35,6 +40,9 @@ dotenv.load_dotenv(dotenv_file)
 
 key = os.environ["OPENAI_API_KEY"]
 openai.api_key = key
+
+from openai import OpenAI
+client = OpenAI()
 
 router = APIRouter(
     prefix="/chatbot",
@@ -100,7 +108,7 @@ def image_def(input: quiz_gen):
         {"role": "user", "content": input.text}
     ]
 
-    chat_completion = openai.ChatCompletion.create(  ## gpt 오브젝트 생성후 메세지 전달
+    chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
         model="gpt-4",
         messages=messages,
         temperature=1,
@@ -285,7 +293,7 @@ class Image_connect(BaseModel):
 
 
 @router.post("/image_connect")
-def image_def(input: Image_connect):
+async def image_def(input: Image_connect):
     print(input.text)
 
     system = '''
@@ -303,15 +311,21 @@ def image_def(input: Image_connect):
         {"role": "user", "content": input.text}
     ]
 
-    chat_completion = openai.ChatCompletion.create(  ## gpt 오브젝트 생성후 메세지 전달
+    chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
         model="gpt-4",
         # model="gpt-4",
         messages=messages,
         temperature=1,
         max_tokens=1000
     )
-    
+
     result = chat_completion.choices[0].message.content
+
+    query = "INSERT INTO place_table (Q, A) VALUES (:Q, :A)"
+    values = {"Q": input.text, "A": result}
+    await database.execute(query=query, values=values)
+
+
     print("분류결과 : "+result)
     return {"place" : result}
 ######################################################
@@ -324,7 +338,7 @@ class Sound_connect(BaseModel):
 
 
 @router.post("/music_connect")
-def Sound_def(input: Sound_connect):
+async def Sound_def(input: Sound_connect):
     print(input.text)
 
     system = '''
@@ -341,7 +355,7 @@ def Sound_def(input: Sound_connect):
         {"role": "user", "content": input.text}
     ]
 
-    chat_completion = openai.ChatCompletion.create(  ## gpt 오브젝트 생성후 메세지 전달
+    chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
         model="gpt-4",
         # model="gpt-4",
         messages=messages,
@@ -350,6 +364,20 @@ def Sound_def(input: Sound_connect):
     )
     
     result = chat_completion.choices[0].message.content
+
+
+    query = "INSERT INTO bgmusic_table (Q, A) VALUES (:Q, :A)"
+    values = {"Q": input.text, "A": result}
+    await database.execute(query=query, values=values)
+
     print("분류결과 : "+result)
     return {"mood" : result}
 ######################################################
+
+@router.on_event("startup")
+async def startup():
+    await database.connect()
+
+@router.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
