@@ -10,6 +10,7 @@ from fastapi import FastAPI, File, UploadFile
 from typing import Union
 from pydantic import BaseModel
 from domain.add_script_mp4s import make_mp4s
+from fastapi.responses import FileResponse
 
 router = APIRouter(
     prefix="/mp4",
@@ -24,9 +25,8 @@ class def_filename(BaseModel):
 ####### 테스트용
 async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)):
     file_n=file_uuid
+
 #######
-
-
 
     save_folder = "pre_mp4"
     if not os.path.exists(save_folder):
@@ -44,8 +44,11 @@ async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)
     sand_folder="post_mp4"
     send_file_location = f"{sand_folder}/{real_filename}"
 
-    with open(send_file_location, "rb") as data:
-        return StreamingResponse(io.BytesIO(data.read()), media_type=file.content_type)
+    return FileResponse(path=send_file_location, media_type="video/mp4")
+
+    ## 이전 바이트 통신
+    # with open(send_file_location, "rb") as data:
+    #     return StreamingResponse(io.BytesIO(data.read()), media_type=file.content_type)
 
 
 
@@ -69,7 +72,6 @@ async def process_video(file_class: def_filename):
     
     with open(send_file_location, "rb") as video_file:
         video_stream = io.BytesIO(video_file.read())
-        print(type(video_stream))
         return StreamingResponse(video_stream, media_type="video/mp4")
 
     # def iterfile():  

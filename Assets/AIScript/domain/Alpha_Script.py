@@ -49,6 +49,9 @@ router = APIRouter(
 )
 
 
+
+
+
 ######################################################
 ### 퀴즈 생성
 class quiz_gen(BaseModel):
@@ -277,7 +280,6 @@ class StreamRequest(BaseModel):
 
 @router.post("/test_text")
 def stream(body: StreamRequest):
-    
 
     print(body.text)
 
