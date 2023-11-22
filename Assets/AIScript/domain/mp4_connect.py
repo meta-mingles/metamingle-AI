@@ -16,17 +16,17 @@ router = APIRouter(
     prefix="/mp4",
 )
 
-class def_filename(BaseModel):
-    file_uuid: str
+# class def_filename(BaseModel):
+#     file_uuid: str
 
 @router.post("/en_script_video/")
 # async def process_video(file: UploadFile = File(...), file_class: def_filename = Depends()): ##file_class json으로 받기
 #     file_n=file_class.file_uuid
 ####### 테스트용
 async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)):
+    # return "gd"
     file_n=file_uuid
-
-#######
+    print("연결됨")
 
     save_folder = "pre_mp4"
     if not os.path.exists(save_folder):
@@ -44,19 +44,19 @@ async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)
     sand_folder="post_mp4"
     send_file_location = f"{sand_folder}/{real_filename}"
 
-    return FileResponse(path=send_file_location, media_type="video/mp4")
+    # return FileResponse(path=send_file_location, media_type="video/mp4")
 
-    ## 이전 바이트 통신
-    # with open(send_file_location, "rb") as data:
-    #     return StreamingResponse(io.BytesIO(data.read()), media_type=file.content_type)
+    # 이전 바이트 통신
+    with open(send_file_location, "rb") as data:
+        return StreamingResponse(io.BytesIO(data.read()), media_type=file.content_type)
 
 
 
 @router.post("/kr_script_video/")
-async def process_video(file_class: def_filename):
+# async def process_video(file_class: def_filename):
+async def process_video(file_uuid: str = Form(...)):
 
-    file_n=f"{file_class.file_uuid}"
-    
+    file_n=file_uuid
     save_folder = "pre_mp4"
     
     file_location = f"{save_folder}/{file_n}.mp4"
@@ -71,9 +71,12 @@ async def process_video(file_class: def_filename):
     print(send_file_location)
     
     with open(send_file_location, "rb") as video_file:
-        video_stream = io.BytesIO(video_file.read())
-        return StreamingResponse(video_stream, media_type="video/mp4")
+        return StreamingResponse(io.BytesIO(video_file.read()), media_type="video/mp4")
 
+    # with open(send_file_location, "rb") as f:
+    #     data = io.BytesIO(f.read())
+    #     return StreamingResponse(data, media_type="video/mp4")  # MIME 타입은 실제 파일에 맞게 지정
+    
     # def iterfile():  
     #     with open(send_file_location, mode="rb") as file_like:  
     #         yield from file_like  
