@@ -62,38 +62,42 @@ def connect_json():
 
 ######################################################
 ### 퀴즈 생성
+
 class quiz_gen(BaseModel):
     text: str
 
 @router.post("/quiz_gen")
 def image_def(input: quiz_gen):
-    print(input.text)
+        print(input.text)
 
-    ## json 연결
-    json_data=connect_json()["quiz_gen"]
+        ## json 연결
+        json_data=connect_json()["quiz_gen"]
 
-    messages = [
-        {"role": "system", "content": json_data["system"]},
-        {"role": "user", "content": json_data["input"][0]},
-        {"role": "assistant", "content": json_data["output"][0]},
-        {"role": "user", "content": json_data["input"][1]},
-        {"role": "assistant", "content": json_data["output"][1]},
-        {"role": "user", "content": json_data["input"][2]},
-        {"role": "assistant", "content": json_data["output"][2]},
-        {"role": "user", "content": input.text}
-    ]
+        messages = [
+            {"role": "system", "content": json_data["system"]},
+            {"role": "user", "content": json_data["input"][0]},
+            {"role": "assistant", "content": json_data["output"][0]},
+            {"role": "user", "content": json_data["input"][1]},
+            {"role": "assistant", "content": json_data["output"][1]},
+            {"role": "user", "content": json_data["input"][2]},
+            {"role": "assistant", "content": json_data["output"][2]},
+            {"role": "user", "content": input.text}
+        ]
+        try:
+            chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
+                model="gpt-4",
+                messages=messages,
+                temperature=1,
+                max_tokens=1000
+            )
+            result = chat_completion.choices[0].message.content
+            output = json.loads(result)
+        except Exception as e: #나중에 더미데이터 넣기
+            output="{\"error\":\"gpt에러\"}"
+            
+        print(output)
+        return output
 
-    chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
-        model="gpt-4",
-        messages=messages,
-        temperature=1,
-        max_tokens=1000
-    )
-    
-    result = chat_completion.choices[0].message.content
-    output = json.loads(result)
-    print(output)
-    return output
 ######################################################
 
 
@@ -116,7 +120,8 @@ async def send_message(text: str) -> AsyncIterable[str]:
         try:
             await fn
         except Exception as e:
-            print(f"Caught exception: {e}")
+            error_message = f"gpt 오류: {e}"
+            print(error_message)
         finally:
             event.set()
 
@@ -126,18 +131,32 @@ async def send_message(text: str) -> AsyncIterable[str]:
     task = asyncio.create_task(wrap_done(
         model.agenerate(messages=[[SystemMessage(content=json_data['system']),HumanMessage(content=json_data['input'][0]),
                                    AIMessage(content=json_data['output'][0]),HumanMessage(content=json_data['input'][1]),
-                                   AIMessage(content=json_data['output'][0]),HumanMessage(content=json_data['input'][2]),
-                                   AIMessage(content=json_data['output'][0]),  HumanMessage(content=text)]]),
+                                   AIMessage(content=json_data['output'][1]),HumanMessage(content=json_data['input'][2]),
+                                   AIMessage(content=json_data['output'][2]),  HumanMessage(content=text)]]),
         callback.done),
     )
 
     n=0
     print("스트리밍 데이터 통신 시작")
+    # async for token in callback.aiter():
+    #     print(n,end=" ")
+    #     n+=1
+    #     print(token)
+    #     final_token+=token
+    #     yield f"data: {token}\n\n"
+    # print("출력결과 : ")
+    # print(final_token)
+    # await task
+
+    error_message=None
     async for token in callback.aiter():
-        print(n,end=" ")
-        n+=1
+        if error_message:
+            yield f"data: {error_message}\n\n"
+            break  # 에러가 발생하면 스트리밍 루프 종료
+        print(n, end=" ")
+        n += 1
         print(token)
-        final_token+=token
+        final_token += token
         yield f"data: {token}\n\n"
     print("출력결과 : ")
     print(final_token)
@@ -174,20 +193,22 @@ async def image_def(input: Image_connect):
         {"role": "assistant", "content": json_data["output"][0]},
         {"role": "user", "content": input.text}
     ]
+    try:
+        chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
+            model="gpt-4",
+            # model="gpt-4",
+            messages=messages,
+            temperature=1,
+            max_tokens=1000
+        )
 
-    chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
-        model="gpt-4",
-        # model="gpt-4",
-        messages=messages,
-        temperature=1,
-        max_tokens=1000
-    )
+        result = chat_completion.choices[0].message.content
 
-    result = chat_completion.choices[0].message.content
-
-    query = "INSERT INTO place_table (Q, A) VALUES (:Q, :A)"
-    values = {"Q": input.text, "A": result}
-    await database.execute(query=query, values=values)
+        query = "INSERT INTO place_table (Q, A) VALUES (:Q, :A)"
+        values = {"Q": input.text, "A": result}
+        await database.execute(query=query, values=values)
+    except Exception as e: #나중에 더미데이터 넣기
+        result="gpt 에러"
 
 
     print("분류결과 : "+result)
@@ -204,14 +225,6 @@ class Sound_connect(BaseModel):
 @router.post("/music_connect")
 async def Sound_def(input: Sound_connect):
     print(input.text)
-
-    system = '''
-        장소 = {"Chill","Cool","Dramatic","Happy","Mysterious","Peaceful","Sad","Serious"}
-        1. 사용자의 시나리오를 보고 알려준 시나리오의 무드 중 1가지로 분류해줘
-        2. 무드를 분류할 수 없는 입력이면 "Peaceful"으로 분류해줘
-        3. 입력이 없으면 "Peaceful"만 나타내줘
-        5. 출력으로는 Mood만 나타내줘 
-        '''
     
     ## json 연결
     json_data=connect_json()["music_connect"]
@@ -223,19 +236,22 @@ async def Sound_def(input: Sound_connect):
         {"role": "user", "content": input.text}
     ]
 
-    chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
-        model="gpt-4",
-        messages=messages,
-        temperature=1,
-        max_tokens=1000
-    )
-    
-    result = chat_completion.choices[0].message.content
+    try:
+        chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
+            model="gpt-4",
+            messages=messages,
+            temperature=1,
+            max_tokens=1000
+        )
+        
+        result = chat_completion.choices[0].message.content
 
 
-    query = "INSERT INTO bgmusic_table (Q, A) VALUES (:Q, :A)"
-    values = {"Q": input.text, "A": result}
-    await database.execute(query=query, values=values)
+        query = "INSERT INTO bgmusic_table (Q, A) VALUES (:Q, :A)"
+        values = {"Q": input.text, "A": result}
+        await database.execute(query=query, values=values)
+    except Exception as e: #나중에 더미데이터 넣기
+        result="gpt 에러"
 
     print("분류결과 : "+result)
     return {"mood" : result}

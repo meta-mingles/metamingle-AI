@@ -10,21 +10,16 @@ from fastapi import FastAPI, File, UploadFile
 from typing import Union
 from pydantic import BaseModel
 from domain.add_script_mp4s import make_mp4s
+from domain.modify_add_script_mp4s import modify_make_mp4s
 from fastapi.responses import FileResponse
 
 router = APIRouter(
     prefix="/mp4",
 )
 
-# class def_filename(BaseModel):
-#     file_uuid: str
-
 @router.post("/en_script_video/")
-# async def process_video(file: UploadFile = File(...), file_class: def_filename = Depends()): ##file_class json으로 받기
-#     file_n=file_class.file_uuid
-####### 테스트용
 async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)):
-    # return "gd"
+    file_uuid="entest"
     file_n=file_uuid
     print("연결됨")
 
@@ -44,16 +39,10 @@ async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)
     sand_folder="post_mp4"
     send_file_location = f"{sand_folder}/{real_filename}"
 
-    # return FileResponse(path=send_file_location, media_type="video/mp4")
-
-    # 이전 바이트 통신
     with open(send_file_location, "rb") as data:
         return StreamingResponse(io.BytesIO(data.read()), media_type=file.content_type)
 
-
-
 @router.post("/kr_script_video/")
-# async def process_video(file_class: def_filename):
 async def process_video(file_uuid: str = Form(...)):
 
     file_n=file_uuid
@@ -72,13 +61,24 @@ async def process_video(file_uuid: str = Form(...)):
     
     with open(send_file_location, "rb") as video_file:
         return StreamingResponse(io.BytesIO(video_file.read()), media_type="video/mp4")
-
-    # with open(send_file_location, "rb") as f:
-    #     data = io.BytesIO(f.read())
-    #     return StreamingResponse(data, media_type="video/mp4")  # MIME 타입은 실제 파일에 맞게 지정
     
-    # def iterfile():  
-    #     with open(send_file_location, mode="rb") as file_like:  
-    #         yield from file_like  
+@router.post("/modi_kr_script_video/")
+# async def process_video(file_class: def_filename):
+async def process_video(file_uuid: str = Form(...)):
 
-    # return StreamingResponse(iterfile(), media_type="video/mp4")
+    file_n=file_uuid
+    save_folder = "pre_mp4"
+    
+    file_location = f"{save_folder}/{file_n}.mp4"
+    
+    language="kr"
+    real_filename=modify_make_mp4s(file_location,file_n,language)
+
+    sand_folder="post_mp4"
+    send_file_location = f"{sand_folder}/{real_filename}"
+    print("경로확인")
+    print(real_filename)
+    print(send_file_location)
+    
+    with open(send_file_location, "rb") as video_file:
+        return StreamingResponse(io.BytesIO(video_file.read()), media_type="video/mp4")

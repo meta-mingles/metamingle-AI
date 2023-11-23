@@ -8,7 +8,7 @@ import deepl
 import os  
 from dotenv import load_dotenv
 
-def make_mp4s(file_location,mp4_id,langauge):
+def modify_make_mp4s(file_location,mp4_id,langauge):
 
     scripts_folder = "Script"
 
@@ -20,54 +20,24 @@ def make_mp4s(file_location,mp4_id,langauge):
 
 # 환경 변수에서 auth_key를 가져와
     auth_key = os.getenv('AUTH_KEY')
-    translator = deepl.Translator(auth_key)
     client = OpenAI()
 
     target_mp4=file_location
 
-    #################### open ai 에서 whisper사용, 영상에서 대본 추출 저장
+    audio_file= open(f'audio/{mp4_id}.mp3', "rb")
+    transcript = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=audio_file,
+        language='ko',
+        response_format="srt"
+    )
+    print(transcript)
 
-    if langauge=="en":
-        script_id_en=f"{mp4_id}_en"
-        script_id_kr=f"{mp4_id}_kr"
+    with open(os.path.join(scripts_folder, f"{mp4_id}_kr.srt"), "w", encoding="utf-8") as file:
+        file.write(transcript)
 
-        video_clip = VideoFileClip(target_mp4)
-        audio_clip = video_clip.audio
+    print("대본 생성완료")
 
-        # 음성 저장 폴더 경로
-        output_folder = 'audio'
-
-        # 저장 폴더가 없으면 생성
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
-
-        # 추출된 음성 저장
-        output_path = os.path.join(output_folder, f'{mp4_id}.mp3')
-        audio_clip.write_audiofile(output_path)
-
-        #번역 대본추출
-        audio_file= open(output_path, "rb")
-        transcript = client.audio.translations.create(
-        model="whisper-1", 
-        file=audio_file, 
-        response_format="srt",
-        )
-
-        # 추출된 한국 대본을 저장
-        kr_script=transcript.split('\n')
-        for i in range(2,len(kr_script),4):
-            kr_script[i] = str(translator.translate_text(kr_script[i], target_lang="ko"))
-            
-        pre_kr_script="\n".join(kr_script)
-
-        with open(os.path.join(scripts_folder, script_id_en+".srt"), "w", encoding="utf-8") as file:
-            file.write(transcript)
-
-        with open(os.path.join(scripts_folder, script_id_kr+".srt"), "w", encoding="utf-8") as file:
-            file.write(pre_kr_script)
-        print("대본 생성완료")
-
-    
     script_id=f"{mp4_id}_{langauge}"
 
     make_script_mp4(script_id,target_mp4)
