@@ -100,14 +100,29 @@ def image_def(input: quiz_gen):
 
 ######################################################
 
+class AsyncStringIterator:
+    def __init__(self, string):
+        self.string = string
+        self.index = 0
 
+    def __aiter__(self):
+        return self
 
+    async def __anext__(self):
+        if self.index < len(self.string):
+            result = self.string[self.index]
+            self.index += 1
+            await asyncio.sleep(0.1)  # 비동기 작업을 시뮬레이션
+            return result
+        else:
+            raise StopAsyncIteration
 
-######################################################
+        
 #### 비동기 스트리밍 통신
-final_token=""
 async def send_message(text: str) -> AsyncIterable[str]:
     final_token=""
+    error_event = asyncio.Event()
+
     callback = AsyncIteratorCallbackHandler()
     model = ChatOpenAI(
         model_name="gpt-4",
@@ -117,61 +132,122 @@ async def send_message(text: str) -> AsyncIterable[str]:
     )
 
     async def wrap_done(fn: Awaitable, event: asyncio.Event):
+        nonlocal final_token
         try:
             await fn
         except Exception as e:
-            error_message = f"gpt 오류: {e}"
-            print(error_message)
-        finally:
-            event.set()
+            final_token = "Error"
+            print(final_token)
+
+            
 
     ## json 연결
     json_data=connect_json()["make_script"]
 
     task = asyncio.create_task(wrap_done(
         model.agenerate(messages=[[SystemMessage(content=json_data['system']),HumanMessage(content=json_data['input'][0]),
-                                   AIMessage(content=json_data['output'][0]),HumanMessage(content=json_data['input'][1]),
-                                   AIMessage(content=json_data['output'][1]),HumanMessage(content=json_data['input'][2]),
-                                   AIMessage(content=json_data['output'][2]),  HumanMessage(content=text)]]),
+                                AIMessage(content=json_data['output'][0]),HumanMessage(content=json_data['input'][1]),
+                                AIMessage(content=json_data['output'][1]),HumanMessage(content=json_data['input'][2]),
+                                AIMessage(content=json_data['output'][2]),  HumanMessage(content=text)]]),
         callback.done),
     )
 
     n=0
-    print("스트리밍 데이터 통신 시작")
-    # async for token in callback.aiter():
-    #     print(n,end=" ")
-    #     n+=1
-    #     print(token)
-    #     final_token+=token
-    #     yield f"data: {token}\n\n"
-    # print("출력결과 : ")
-    # print(final_token)
-    # await task
 
-    error_message=None
     async for token in callback.aiter():
-        if error_message:
-            yield f"data: {error_message}\n\n"
-            break  # 에러가 발생하면 스트리밍 루프 종료
         print(n, end=" ")
         n += 1
         print(token)
-        final_token += token
         yield f"data: {token}\n\n"
-    print("출력결과 : ")
-    print(final_token)
+
     await task
 
+
+
+    if final_token.startswith("Error"):
+        async_string = AsyncStringIterator("에러입니다.")
+        async for char in async_string:
+            yield f"data: {char}\n\n"
+        # yield f"data: {final_token}\n\n"
+
+    print(4)
+    
 class StreamRequest(BaseModel):
     text: str
-
 
 @router.post("/make_script")
 def stream(body: StreamRequest):
     print(body.text)
     return StreamingResponse(send_message(body.text), media_type="text/event-stream")
-######################################################
 
+# ######################################################
+# #### 비동기 스트리밍 통신
+# final_token=""
+# async def send_message(text: str) -> AsyncIterable[str]:
+#     final_token=""
+#     callback = AsyncIteratorCallbackHandler()
+#     model = ChatOpenAI(
+#         model_name="gpt-4",
+#         streaming=True,
+#         verbose=True,
+#         callbacks=[callback],
+#     )
+
+#     async def wrap_done(fn: Awaitable, event: asyncio.Event):
+#         try:
+#             await fn
+#         except Exception as e:
+#             error_message = f"gpt 오류: {e}"
+#             print(error_message)
+#         finally:
+#             event.set()
+
+#     ## json 연결
+#     json_data=connect_json()["make_script"]
+
+#     task = asyncio.create_task(wrap_done(
+#         model.agenerate(messages=[[SystemMessage(content=json_data['system']),HumanMessage(content=json_data['input'][0]),
+#                                    AIMessage(content=json_data['output'][0]),HumanMessage(content=json_data['input'][1]),
+#                                    AIMessage(content=json_data['output'][1]),HumanMessage(content=json_data['input'][2]),
+#                                    AIMessage(content=json_data['output'][2]),  HumanMessage(content=text)]]),
+#         callback.done),
+#     )
+
+#     n=0
+#     print("스트리밍 데이터 통신 시작")
+#     # async for token in callback.aiter():
+#     #     print(n,end=" ")
+#     #     n+=1
+#     #     print(token)
+#     #     final_token+=token
+#     #     yield f"data: {token}\n\n"
+#     # print("출력결과 : ")
+#     # print(final_token)
+#     # await task
+
+#     error_message=None
+#     async for token in callback.aiter():
+#         if error_message:
+#             yield f"data: {error_message}\n\n"
+#             break  # 에러가 발생하면 스트리밍 루프 종료
+#         print(n, end=" ")
+#         n += 1
+#         print(token)
+#         final_token += token
+#         yield f"data: {token}\n\n"
+#     print("출력결과 : ")
+#     print(final_token)
+#     await task
+
+# class StreamRequest(BaseModel):
+#     text: str
+
+
+# @router.post("/make_script")
+# def stream(body: StreamRequest):
+#     print(body.text)
+#     return StreamingResponse(send_message(body.text), media_type="text/event-stream")
+# ######################################################
 
 
 ######################################################
