@@ -180,76 +180,6 @@ def stream(body: StreamRequest):
     print(body.text)
     return StreamingResponse(send_message(body.text), media_type="text/event-stream")
 
-# ######################################################
-# #### 비동기 스트리밍 통신
-# final_token=""
-# async def send_message(text: str) -> AsyncIterable[str]:
-#     final_token=""
-#     callback = AsyncIteratorCallbackHandler()
-#     model = ChatOpenAI(
-#         model_name="gpt-4",
-#         streaming=True,
-#         verbose=True,
-#         callbacks=[callback],
-#     )
-
-#     async def wrap_done(fn: Awaitable, event: asyncio.Event):
-#         try:
-#             await fn
-#         except Exception as e:
-#             error_message = f"gpt 오류: {e}"
-#             print(error_message)
-#         finally:
-#             event.set()
-
-#     ## json 연결
-#     json_data=connect_json()["make_script"]
-
-#     task = asyncio.create_task(wrap_done(
-#         model.agenerate(messages=[[SystemMessage(content=json_data['system']),HumanMessage(content=json_data['input'][0]),
-#                                    AIMessage(content=json_data['output'][0]),HumanMessage(content=json_data['input'][1]),
-#                                    AIMessage(content=json_data['output'][1]),HumanMessage(content=json_data['input'][2]),
-#                                    AIMessage(content=json_data['output'][2]),  HumanMessage(content=text)]]),
-#         callback.done),
-#     )
-
-#     n=0
-#     print("스트리밍 데이터 통신 시작")
-#     # async for token in callback.aiter():
-#     #     print(n,end=" ")
-#     #     n+=1
-#     #     print(token)
-#     #     final_token+=token
-#     #     yield f"data: {token}\n\n"
-#     # print("출력결과 : ")
-#     # print(final_token)
-#     # await task
-
-#     error_message=None
-#     async for token in callback.aiter():
-#         if error_message:
-#             yield f"data: {error_message}\n\n"
-#             break  # 에러가 발생하면 스트리밍 루프 종료
-#         print(n, end=" ")
-#         n += 1
-#         print(token)
-#         final_token += token
-#         yield f"data: {token}\n\n"
-#     print("출력결과 : ")
-#     print(final_token)
-#     await task
-
-# class StreamRequest(BaseModel):
-#     text: str
-
-
-# @router.post("/make_script")
-# def stream(body: StreamRequest):
-#     print(body.text)
-#     return StreamingResponse(send_message(body.text), media_type="text/event-stream")
-# ######################################################
-
-
 ######################################################
 ### 이미지 분류 통신
 class Image_connect(BaseModel):
@@ -267,6 +197,8 @@ async def image_def(input: Image_connect):
         {"role": "system", "content": json_data["system"]},
         {"role": "user", "content": json_data["input"][0]},
         {"role": "assistant", "content": json_data["output"][0]},
+        {"role": "user", "content": json_data["input"][1]},
+        {"role": "assistant", "content": json_data["output"][1]},
         {"role": "user", "content": input.text}
     ]
     try:

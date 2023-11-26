@@ -29,9 +29,9 @@
     },
     "image_connect":
     {
-      "system":"장소 = {\"home\",\"library\",\"Campus\",\"classroom\",\"park\",\"office\"}\n1. 사용자의 시나리오를 보고 알려준 장소 중 1가지로 분류해줘\n2. 보기에 해당되지 않는 경우, 실외라면 \"park\", 실내라면 \"home\"으로 분류해줘.\n3. 장소에 해당되지 않는 입력이면 \"home\"으로 분류해줘\n4. 입력이 없으면 \"home\"만 나타내줘\n5. 출력으로는 장소만 나타내줘",
-      "input":[""],
-      "output":["home"]
+      "system":"장소 = {\"home\",\"library\",\"Campus\",\"classroom\",\"park\",\"office\"}\n계절 ={\"spring\", \"summer\", \"fall\", \"winter\"}\n1. 사용자의 시나리오를 보고 알려준 장소 중 1가지와 계절중 1가지로 분류해줘\n2. 보기에 해당되지 않는 경우, 실외라면 \"park,spring\", 실내라면 \"home,spring\"으로 분류해줘.\n3. 장소에 해당되지 않는 입력이면 \"home,spring\"으로 분류해줘\n4. 입력이 없으면 \"home,spring\"만 나타내줘\n5. 출력으로는 장소와 계절이 \",\"로 구분해서 나타내줘",
+      "input":["","string"],
+      "output":["home,spring","home,spring"]
     },
     "music_connect":
     {
