@@ -17,9 +17,9 @@ router = APIRouter(
     prefix="/mp4",
 )
 
-@router.post("/en_script_video")
+@router.post("/en_script_video/")
 async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)):
-    
+    print("영어 대본 영상만들기")
     file_n=file_uuid
     print("연결됨")
 
@@ -44,7 +44,7 @@ async def process_video(file: UploadFile = File(...), file_uuid: str = Form(...)
 
 @router.post("/kr_script_video/")
 async def process_video(file_uuid: str = Form(...)):
-
+    print("한국 대본 영상만들기")
     file_n=file_uuid
     save_folder = "pre_mp4"
     
@@ -62,9 +62,10 @@ async def process_video(file_uuid: str = Form(...)):
     with open(send_file_location, "rb") as video_file:
         return StreamingResponse(io.BytesIO(video_file.read()), media_type="video/mp4")
     
-@router.post("/modi_kr_script_video")
+@router.post("/modi_kr_script_video/")
 # async def process_video(file_class: def_filename):
 async def process_video(file_uuid: str = Form(...)):
+    print("한국2 대본 영상만들기")
 
     file_n=file_uuid
     save_folder = "pre_mp4"

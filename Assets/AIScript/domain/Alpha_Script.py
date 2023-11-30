@@ -93,7 +93,8 @@ def image_def(input: quiz_gen):
             result = chat_completion.choices[0].message.content
             output = json.loads(result)
         except Exception as e: #나중에 더미데이터 넣기
-            output="{\"error\":\"gpt에러\"}"
+            output='''"제목: \"크리스마스 카드를 보내는 미국의 문화 이야기\"|\n\n(카메라에게 인사하며)|\n\"안녕. 오늘은 작년 크리스마스 때 벌어진 한 이야기를 들려주고 싶어.\" |\n\n내용:|\n(카메라에게 인사하며)|\n\"그때 내가 미국에서 알게 된 친구에게 크리스마스 카드를 안 보냈거든.\" |\n\"그랬더니 그 친구가 진짜로 굉장히 서운해했어.\" |\n\n(카메라에게 인사하며)|\n\"미국에서는 크리스마스 카드를 주고 받는 게 일상적인 문화라고 하더라고.\" |\n\"그래서 그 친구 가 왜 그렇게 서운해 하는지 이해가 갔어.\" |\n\n결론:|\n\" 미국인 친구가 있으면 꼭 편지를 써줘야 해\" |\n\n(카메라에게 웃으며 손을 흔들며)|\n\"다음에 또 재미있는 이야기로 찾아올게. 바이바이~.\"\n\n"'''
+
             
         print(output)
         return output
@@ -145,10 +146,11 @@ async def send_message(text: str) -> AsyncIterable[str]:
     json_data=connect_json()["make_script"]
 
     task = asyncio.create_task(wrap_done(
-        model.agenerate(messages=[[SystemMessage(content=json_data['system']),HumanMessage(content=json_data['input'][0]),
-                                AIMessage(content=json_data['output'][0]),HumanMessage(content=json_data['input'][1]),
-                                AIMessage(content=json_data['output'][1]),HumanMessage(content=json_data['input'][2]),
-                                AIMessage(content=json_data['output'][2]),  HumanMessage(content=text)]]),
+        model.agenerate(messages=[[SystemMessage(content=json_data['system']),HumanMessage(content=json_data['input'][0]),AIMessage(content=json_data['output'][0]),
+                                   HumanMessage(content=json_data['input'][1]),AIMessage(content=json_data['output'][1]),
+                                HumanMessage(content=json_data['input'][2]),AIMessage(content=json_data['output'][2]),
+                                HumanMessage(content=json_data['input'][3]),AIMessage(content=json_data['output'][3]),
+                                  HumanMessage(content=text)]]),
         callback.done),
     )
 
@@ -204,7 +206,6 @@ async def image_def(input: Image_connect):
     try:
         chat_completion = client.chat.completions.create(  ## gpt 오브젝트 생성후 메세지 전달
             model="gpt-4",
-            # model="gpt-4",
             messages=messages,
             temperature=1,
             max_tokens=1000
@@ -218,6 +219,8 @@ async def image_def(input: Image_connect):
     except Exception as e: #나중에 더미데이터 넣기
         result="gpt 에러"
 
+    ## 시연전용
+    result ="home,winter"
 
     print("분류결과 : "+result)
     return {"place" : result}
@@ -262,6 +265,7 @@ async def Sound_def(input: Sound_connect):
         result="gpt 에러"
 
     print("분류결과 : "+result)
+    result="Peaceful"
     return {"mood" : result}
 ######################################################
 

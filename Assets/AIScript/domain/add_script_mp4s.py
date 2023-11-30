@@ -99,7 +99,7 @@ def make_script_mp4(script_id,target_mp4):
             start, end = lines[i+1].strip().split(" --> ")
             text = lines[i+2].strip()
             #출력 자막이 길어지면 두줄로 처리
-            parse_len=40
+            parse_len=60
             if "kr" in script_id:
                 parse_len =30
 
@@ -144,7 +144,7 @@ def make_script_mp4(script_id,target_mp4):
 
     # 영상에 추가할 자막 폰트 설정
     font_path = "kbo.ttf"
-    text_position = ('center', video.size[1]*(0.80))
+    text_position = ('center', video.size[1]*(0.70))
     # 각 자막에 대한 TextClip 생성 및 위치 설정7
     clips = [video]
     for subtitle in subtitles:
