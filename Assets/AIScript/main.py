@@ -6,9 +6,11 @@ from typing import Union
 
 from fastapi import FastAPI
 #dsds
-from domain import Alpha_Script,mp4_connect
+
+from domain import Alpha_Script,mp4_connect, chat_translate
 
 app = FastAPI()
 
 app.include_router(Alpha_Script.router)
 app.include_router(mp4_connect.router)
+app.include_router(chat_translate.router)
