@@ -48,12 +48,28 @@
 
 **`1️⃣ 웹캠 - Unity 실시간 모션트래킹 `**
 
+
+https://github.com/meta-mingles/metamingle-AI/assets/83994550/1bd7a55e-6501-4ae4-a9ad-b299db33a304
+
+
 **`2️⃣ 사용자 경험담으로 AI 대본, 배경 이미지, BGM 생성 `**
 
+![사용자 이야기 To Gpt,SDXL,BGM](https://github.com/meta-mingles/metamingle-AI/assets/83994550/7dcbf660-0b7c-4f62-ac47-c2ace08f99ac)
+
+
 **`3️⃣ 사용자가 만든 영상에 한/영 자막 자동생성 `**
+
+![대본생성](https://github.com/meta-mingles/metamingle-AI/assets/83994550/1a2d2d0c-5c5c-409a-b0e5-e8673cbd2af1)
+
 
 ### 플랫폼
 
 **`1️⃣ 사용자 경험담으로 퀴즈 만들기 `**
+
+
+
+https://github.com/meta-mingles/metamingle-AI/assets/83994550/cf09b176-4953-459a-aee4-71c5f3ec49aa
+
+
 
 
